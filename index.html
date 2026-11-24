@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Tempahan Pusat Sumber Sekolah</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 950px; margin: 20px auto; padding: 0 20px; background: #f0f4f8; color: #333; }
+        header { background: #1e3a8a; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        header h1 { margin: 0; font-size: 1.6rem; }
+        header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.95rem; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; }
+        @media (max-width: 768px) { .grid-container { grid-template-columns: 1fr; } }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        h2 { margin-top: 0; font-size: 1.2rem; color: #1e3a8a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        label { display: block; margin-top: 10px; font-weight: 600; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 9px; margin-top: 4px; border: 1px solid #cbd5e1; border-radius: 5px; box-sizing: border-box; font-size: 0.95rem; }
+        button { width: 100%; padding: 11px; margin-top: 15px; background: #2563eb; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #1d4ed8; }
+        .btn-export { background: #16a34a; width: auto; padding: 8px 14px; font-size: 0.85rem; margin-top: 0; }
+        .btn-export:hover { background: #15803d; }
+        .btn-delete { background: #ef4444; width: auto; padding: 5px 10px; font-size: 0.8rem; margin-top: 0; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f8fafc; color: #475569; }
+        .badge { background: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+        .empty-msg { text-align: center; color: #64748b; padding: 20px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🏫 SCHOOL RESOURCE CENTER (PSS) BOOKING SYSTEM)</h1>
+    <p>Slot Reservation for Library Area & Reading Corner Use</p>
+</header>
+
+<div class="grid-container">
+    <!-- Bahagian Borang Tempahan -->
+    <div class="card">
+        <h2>New Boking Form</h2>
+        <form id="bookingForm" onsubmit="addBooking(event)">
+            <label for="teacher">Teacher's Name</label>
+            <select id="teacher" required>
+                <option value="">-- Choose Teacher Name --</option>
+            </select>
+
+            <label for="classGroup">Class</label>
+            <select id="classGroup" required>
+                <option value="">-- Select Class --</option>
+            </select>
+
+            <label for="date">Usage Date</label>
+            <input type="date" id="date" required>
+
+            <label for="slot">Time Slot</label>
+            <select id="slot" required>
+               <option value="">-- Select Time Slot --</option>
+                <option value="Slot 1 (08:15 - 09:05)">Slot 1 (08:15 - 09:05)</option>
+                <option value="Slot 2 (09:05 - 09:40)">Slot 2 (09:05 - 09:40)</option>
+                <option value="Slot 3 (09:40 - 10:15)">Slot 3 (09:40 - 10:15)</option>
+                <option value="Slot 4 (10:15 - 10:50)">Slot 4 (10:15 - 10:50)</option>
+                <option value="Slot 5 (10:50 - 11:25)">Slot 5 (10:50 - 11:25)</option>
+                <option value="Slot 6 (11:25 - 11:45)">Slot 6 (11:25 - 11:45)</option>
+		<option value="Slot 7 (11:45 - 12:20)">Slot 7 (11:45 - 12:20)</option>
+		<option value="Slot 8 (12:20 - 12:55)">Slot 8 (12:20 - 12:55)</option>
+		<option value="Petang (12:55 - 13:30)">Petang (12:55 - 13:30)</option>
+		<option value="Petang (01:30 - 02:00)">Petang (01:30 - 02:00)</option>
+		<option value="Petang (02:00 - 03:00)">Petang (02:00 - 03:00)</option>
+            </select>
+
+            <label for="purpose">Purpose / Activity</label>
+            <select id="purpose" required>
+                <option value="Nilam Program">Nilam Program</option>
+                <option value="Teaching / Class">Teaching / Class</option>
+                <option value="Meeting / Breafing">Meeting / Breafing</option>
+                <option value="CCA's">CCA's</option>
+		<option value="Relief Class">Relief Class</option>
+
+            </select>
+
+            <button type="submit">Confirm Booking</button>
+        </form>
+    </div>
+
+    <!-- Bahagian Senarai Tempahan -->
+    <div class="card">
+        <div class="toolbar">
+            <h2 style="border:none; margin:0; padding:0;">Reservation Schedule</h2>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input type="date" id="filterDate" onchange="renderBookings()" title="Tapis ikut tarikh" style="margin:0; padding:6px;">
+                <button class="btn-export" onclick="exportCSV()">📥 Download CSV</button>
+            </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date & Slot</th>
+                        <th>Teacher & Class</th>
+                        <th>Purpose</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingList"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Senarai nama guru (tambah atau edit di sini)
+    const teachers = [
+        "Cikgu Ahmad bin Ali",
+        "Cikgu Siti Nurhaliza",
+        "Cikgu Muthu a/l Krishnan",
+        "Cikgu Lim Mei Ling",
+        "Cikgu Nor Azlina"
+    ];
+
+    // Senarai kelas / unit (tambah atau edit di sini)
+    const classes = [
+         "Year 1 Tulip",
+        "Year 1 Daisy",
+        "Year 2 Tulip",
+	"Year 2 Daisy",
+	"Year 3 Tulip",
+	"Year 3 Daisy",
+        "Year 4 Tulip",
+	"Year 4 Daisy",
+	"Year 5",
+	"Year 6 Tulip",
+	"Year 6 Daisy",
+	"Year 7",
+	"Year 8 Tulip",
+	"Year 8 Daisy",
+	"Year 9 Tulip",
+	"Year 9 Daisy",
+	"Year 10 Business",
+	"Year 10 Sciene",
+	"Year 11 Business",
+	"Year 11 Sciene",
+    ];
+
+    // Isi dropdown nama guru
+    const teacherSelect = document.getElementById('teacher');
+    teachers.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        teacherSelect.appendChild(option);
+    });
+
+    // Isi dropdown kelas / unit
+    const classSelect = document.getElementById('classGroup');
+    classes.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls;
+        option.textContent = cls;
+        classSelect.appendChild(option);
+    });
+
+    let bookings = JSON.parse(localStorage.getItem('pssBookings')) || [];
+
+    // Tetapkan tarikh hari ini secara lalai pada borang
+    document.getElementById('date').valueAsDate = new Date();
+
+    function addBooking(e) {
+        e.preventDefault();
+        const teacher = document.getElementById('teacher').value;
+        const classGroup = document.getElementById('classGroup').value;
+        const date = document.getElementById('date').value;
+        const slot = document.getElementById('slot').value;
+        const purpose = document.getElementById('purpose').value;
+
+        // Semak jika tarikh dan slot sudah ditempah (Anti-Clash)
+        const isClash = bookings.some(b => b.date === date && b.slot === slot);
+        if (isClash) {
+            alert(`Sorry! ${slot} on ${date} already booked. Please select another slot or date.`);
+            return;
+        }
+
+        bookings.push({ id: Date.now(), teacher, classGroup, date, slot, purpose });
+        // Susun ikut tarikh terdekat
+        bookings.sort((a, b) => a.date.localeCompare(b.date) || a.slot.localeCompare(b.slot));
+        
+        localStorage.setItem('pssBookings', JSON.stringify(bookings));
+        document.getElementById('bookingForm').reset();
+        document.getElementById('date').value = date;
+        renderBookings();
+        alert("Tempahan berjaya direkodkan!");
+    }
+
+    function deleteBooking(id) {
+        if (confirm("Padam rekod tempahan ini?")) {
+            bookings = bookings.filter(b => b.id !== id);
+            localStorage.setItem('pssBookings', JSON.stringify(bookings));
+            renderBookings();
+        }
+    }
+
+    function renderBookings() {
+        const tbody = document.getElementById('bookingList');
+        const filterDate = document.getElementById('filterDate').value;
+        tbody.innerHTML = '';
+
+        const filtered = filterDate ? bookings.filter(b => b.date === filterDate) : bookings;
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">No booking records found.</td></tr>`;
+            return;
+        }
+
+        filtered.forEach(b => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${b.date}</strong><br><span class="badge">${b.slot}</span></td>
+                <td>${b.teacher}<br><small style="color:#64748b;">${b.classGroup}</small></td>
+                <td>${b.purpose}</td>
+                <td><button class="btn-delete" onclick="deleteBooking(${b.id})">Delete</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function exportCSV() {
+        if (bookings.length === 0) return alert("Tiada data untuk dieksport.");
+        let csv = "Tarikh,Slot Masa,Nama Guru,Kelas/Unit,Tujuan\n";
+        bookings.forEach(b => {
+            csv += `"${b.date}","${b.slot}","${b.teacher}","${b.classGroup}","${b.purpose}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Rekod_Tempahan_PSS_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+    }
+
+    renderBookings();
+</script>
+</body>
+</html>
